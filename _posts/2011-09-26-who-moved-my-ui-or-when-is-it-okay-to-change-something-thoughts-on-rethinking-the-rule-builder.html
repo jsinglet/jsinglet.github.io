@@ -1,0 +1,79 @@
+---
+layout: post
+title:  "Who Moved My UI? Or: When is it Okay to Change Something? Thoughts on Rethinking the Rule Builder"
+date:   2011-09-26
+---
+<p>Nothing makes my nerd heart beat harder than good interface design. And one of the most interesting aspects about interface design is the issue of reinventing or improving well-established UI elements and conventions.</p>
+<p>But while everyone agrees that designs can always be improved it’s not always clear what that means and more importantly, if it’s even possible.</p>
+<p>I’ve overheard many heated arguments in which someone eventually says something like: “Everyone <em>expects</em> x to work like y, so you can’t change it!!” (This is usually the deathblow to the other person. They walk away, tail between legs, to go silently Facebook-stalk their ex-girlfriend.)</p>
+ <p>And you know what, this sort of system seems to work. Most of the time. But that’s only because most of the time we come up with terrible, terrible ideas. But sometimes new controls and ways of doing things <em>do </em>need to get designed. How to settle this age-old argument?</p>
+<p>The first thing is to understand that <strong>it is okay to change things.</strong> This should be obvious. But when? Companies like Apple have invented entire new widget standards with phenomenal success while others have floundered. What did they do differently?</p>
+<p>As a framework for discussing that, let’s start by classifying our UI elements. I suggest the following classification for thinking about UI elements:</p>
+<ul>
+<li>Semiotic Elements (eg: Radio Buttons vs Circles)</li>
+<li>Paradigm Elements (eg: Click/Drag vs Swipe/Touch)</li>
+<li>Functional Elements (eg: Clicking on a table header to sort vs pulling down a drop down.)</li>
+</ul>
+<p>Naturally, each of these refers to either general or specific parts of a user experience as indicated by the image, below.</p>
+<p style="text-align: center;"><a href="/images/Screen-Shot-2011-09-26-at-5.06.16-PM1.png"><img class="aligncenter size-medium wp-image-54" title="Screen Shot 2011-09-26 at 5.06.16 PM" src="/images/Screen-Shot-2011-09-26-at-5.06.16-PM1-300x177.png" alt="" width="300" height="177" /></a><a href="/images/Screen-Shot-2011-09-26-at-5.06.16-PM.png"><br />
+</a></p>
+<h1></h1>
+<h1>The Semiotic Element – eg: Radio Buttons vs Circles.</h1>
+<p>The most core relationship a UI element has to its user is its Semiotic meaning. This can be a property as simple as “is this element selected?” or “what does activating this control <em>mean?</em>” Controls in this category are things like check boxes, radio buttons, highlighted table cells. Why? Because they all mean one thing: “This thing right here.” And though, to a programmer/designer, the difference between a radio button and a checkbox is oceanic, to a user, all they mean to say when the click or check something is “this thing right here.”</p>
+<p>If you want to convince yourself of this, check out the image, below:</p>
+<p style="text-align: center;"><a href="/images/Screen-Shot-2011-09-26-at-5.48.49-PM.png"><img class="aligncenter size-full wp-image-78" title="Screen Shot 2011-09-26 at 5.48.49 PM" src="/images/Screen-Shot-2011-09-26-at-5.48.49-PM.png" alt="" width="355" height="352" /></a></p>
+<p>The only difference between these two is the fact that on the programmatic form, you are not allowed to select more than one. On the paper form you are on the honor system.</p>
+<p>So can components of this category be reinvented? Of course! With the following caveat:</p>
+<p style="text-align: center;"><em>Never change the meaning of a click or a highlight or placement meaning “This thing right here.”</em></p>
+<p>Imagine if to select something a user had to <em>unselect</em> the item he wanted? Workable, but chaos. And the reasons for this are probably so hardwired into our brains that it’s probably not even worth exploring the alternatives. That is, if your goal is to make usable user interfaces.</p>
+<p><strong> </strong></p>
+<h1></h1>
+<h1>The Paradigm Element – eg: Click/Drag vs Swipe/Touch</h1>
+<p>Paradigm elements have to do with the <em>way we think</em> about things. A good example of something in this category is the concept of basing the storage of a hard disk off of 1950’s office technology: Files and folders.</p>
+<p>While “files and folders” are an overwhelmingly popular way to think about your data, it’s hardly universal. For example, <a href="http://en.wikipedia.org/wiki/Plan_9_from_Bell_Labs#File_systems.2C_files_and_names">Plan 9 doesn’t really use “file and folders” at all</a>. And of course, more famously, the iPhone, from a user perspective, doesn’t even <strong>have</strong> a filesystem!</p>
+<p>It’s surprising to realize it, but even things like the filesystem, or even files can be changed. That’s because as humans we are really, really good at inventing new ways of doing things. In fact, the term “Paradigm Shift” has practically become as bourgeois as the <em>word</em> bourgeois!</p>
+<p style="text-align: center;"><a href="/images/Screen-Shot-2011-09-26-at-5.08.39-PM1.png"><img class="aligncenter size-large wp-image-58" title="Screen Shot 2011-09-26 at 5.08.39 PM" src="/images/Screen-Shot-2011-09-26-at-5.08.39-PM1-1024x651.png" alt="" width="632" height="401" /></a></p>
+<p>So paradigm shifts are ok. Just so long as the paradigm you replace it with is as complete as the one it replaces—or has really good reasons for not being.</p>
+<h1></h1>
+<h1>The Functional Element eg: Clicking on a table header to sort vs pulling down a drop down.</h1>
+<p>There are lots of ways to skin a cat. Or at least that’s what elements belonging to the Functional Element group think.</p>
+<p>Examples of this type of element are things like the OSX Dock, the Windows Start Menu, and sortable tables—all things that can be done a million ways. Also, all elements that use a combination of elements to provide the user with a much higher level function than saying “this thing right here.”</p>
+<p>Functional components give the user the ability to say “I want all of the albums by 1972 David Bowie from the Ziggy Stardust tour, but I don’t know how to spell “Bowie” or what year the Stardust tour was.” Or even simply, “Is my package on time?”</p>
+<p>These are arguably some of the <em>most </em>malleable components. Mainly because in creating their own language they use so much of the language of the Paradigm and Semiotic elements. For example, clicking on a table header might cause a highlight, which then highlights the sorted column. The meaning of “this thing right there” is preserved.</p>
+<p>Really, the general rule of an element of the Functional type is simply that they allow the user to perform the function they expect to perform or that the function is possible given proper training.</p>
+<p>This is where the problems start.</p>
+<p>Designers and Programmers sense that this element is “ok” to change and they do. And because there appear to be no rules for doing so, the results are often terrible, unworkable, illogical interfaces that make users feel stupid and cost your company or project money and users.</p>
+<p>Elements of this category are often incredibly hard to make and often represent the bulk of work done by programming and design teams.</p>
+<h1></h1>
+<h1>My Dilemma – Designing the Rule Builder</h1>
+<p>So what is the practical impact of all this you ask? It’s something you can apply to your day-to-day work.</p>
+<p>I recently had to do this on a control I was making: A Rule Builder.</p>
+<p>The goal was to make a control, similar to the way a mailbox filter builder that would allow a user to build a very complex set of interactions.</p>
+<p>So the question for me was: is it okay to reinvent this control? Is it even possible? Seeing as a rule builder would fall under a “Functional” element, I decided that it would be.</p>
+<p>I asked myself: What is wrong with the current paradigm? The answer? A lot. The current paradigm works something like this:</p>
+<p><a href="/images/Screen-Shot-2011-09-26-at-4.10.56-PM.png"><img class="aligncenter size-full wp-image-47" title="Screen Shot 2011-09-26 at 4.10.56 PM" src="/images/Screen-Shot-2011-09-26-at-4.10.56-PM.png" alt="" width="530" height="112" /></a></p>
+<p>One builds a “ruleset” by adding together these elements in rows. For an example of one of the better implementations of this, check out the Apple Mail filter builder:</p>
+<p>Take the example of Apple Mail’s Rule Builder:</p>
+<p><a href="/images/rules.png"><img class="aligncenter size-full wp-image-46" title="rules" src="/images/rules.png" alt="" width="444" height="174" /></a></p>
+<p>Here they’ve done nice stuff like added natural user language to the process and placed all the controls in the right places and even made the action of the filter very, very clear. But there were several things I didn’t like about Apple’s approach.</p>
+<p>First, Apple’s implementation relies on over simplification of the problem. One cannot group together the logic of the filter.</p>
+<p>Second this design uses the same “double drop down” approach that the standard UI convention uses. This itself has a number of problems. Mainly, a user has to click twice, and must then move between the “what to filter” and “how to compare” options of the form if they wish to get a complete picture of all of their filtering options. In other words, a user has no context.</p>
+<p>And then there’s other approaches, some of which are just too bad for words:</p>
+<p><a href="/images/CustomFilter1.gif"><img class="aligncenter size-full wp-image-45" title="CustomFilter1" src="/images/CustomFilter1.gif" alt="" width="548" height="406" /></a></p>
+<p><strong>Kill me now.</strong></p>
+<p>So in designing my own rule builder, I sought to overcome the flaws I found in Apple’s builder, as well as add a few more constraints. The original design document I wrote up went something like this:</p>
+<ol>
+<li>The element should allow the user to use natural language to describe what they want.</li>
+<li>It should absolutely minimize the number of clicks needed to complete the action</li>
+<li>It should be built in Javascript/CSS/HTML and require no images and a very minimal amount of markup.</li>
+<li>It should give the user the ability to see ALL of their options at once.</li>
+<li>The value of the control should be expressed as in a single value as a aggregate – in my case JSON.</li>
+<li>The state of the control should be easy to restore.</li>
+<li>The control should use all standard html form elements.</li>
+</ol>
+<p>And you can see the result of all this work, below:</p>
+<p><a href="/images/Screen-Shot-2011-09-26-at-4.43.06-PM.png"><img class="aligncenter size-full wp-image-44" title="Screen Shot 2011-09-26 at 4.43.06 PM" src="/images/Screen-Shot-2011-09-26-at-4.43.06-PM.png" alt="" width="590" height="320" /></a></p>
+<p>In the rule builder, the first drop down is replaced with a string label, and the user, when they click the drop down, can select from a hierarchical menu that shows them all of their options at once.</p>
+<p>A couple of simple changes, but a lot better. In fact, I liked the control so much, I decided to open source it and a few other controls as a part of my Prototype-Widgets project.</p>
+<p>You can see the source as well as an interactive demo over on github, here: <a href="http://jsinglet.github.com/Prototype-Widgets/">http://jsinglet.github.com/Prototype-Widgets/</a></p>
+<p>Well there you have it. Thanks for reading! Happy hacking!</p>

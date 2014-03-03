@@ -1,0 +1,33 @@
+---
+layout: default
+title: The Singleton
+---
+<ul id="postlist">
+  {% for post in site.posts %}
+
+  
+  <li class="post type-post hentry category-uncategorized">
+    <a href="http://www.the-singleton.com/author/john/" title="Posts by john"><img alt='' src='http://0.gravatar.com/avatar/0c20a3555a48a904cda4dbb144972844?s=48&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D48&amp;r=G' class='avatar avatar-48 photo' height='48' width='48' /></a>					<h4>
+      <span class="meta">
+	<abbr >{{ post.date | date: '%B %d, %Y' }}
+	</abbr>								<span class="actions">
+	  <a href="{{post.url}}" class="thepermalink">Permalink</a>
+	</span>
+      </span>
+    </h4>
+
+
+    <div class="postcontent" id="content-242">
+      
+      
+      <h2><a href="{{post.url}}">{{ post.title }}</a></h2>	
+
+      {{ post.content }}
+
+    </div>
+
+    <div class="bottom_of_entry">&nbsp;</div>
+  </li>			
+  {% endfor %}
+</ul>
+

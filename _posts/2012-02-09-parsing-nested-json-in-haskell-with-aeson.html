@@ -1,0 +1,186 @@
+---
+layout: post
+title:  "Parsing Nested JSON in Haskell with AESON"
+date:   2012-02-09
+---
+
+<p>Parsing JSON in Haskell is one of the most painless experiences one can have as far as parsing goes... except for one little thing. Aeson, which is one of the best JSON libraries for Haskell out there, is so under-documented so as to make it almost impossible to use for all the the most trivial case.</p>
+<p>My case was that I needed to parse the Yammer JSON feed, which had quite a few nested fields. The schema looked, basically like this:</p>
+
+<div class="wp_syntax"><div class="code"><pre class="javascript" style="font-family:monospace;">&nbsp;
+<span style="color: #009900;">&#123;</span>
+  <span style="color: #3366CC;">&quot;messages&quot;</span><span style="color: #339933;">:</span> <span style="color: #009900;">&#91;</span>
+    <span style="color: #009900;">&#123;</span>
+      <span style="color: #3366CC;">&quot;client_url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://www.yammer.com/&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;created_at&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;2011/03/28 20:39:12 +0000&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;system_message&quot;</span><span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">false</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;body&quot;</span><span style="color: #339933;">:</span> <span style="color: #009900;">&#123;</span>
+        <span style="color: #3366CC;">&quot;parsed&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;message with photo attachment.&quot;</span><span style="color: #339933;">,</span>
+        <span style="color: #3366CC;">&quot;plain&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;message with photo attachment.&quot;</span>
+      <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;sender_type&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;user&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;network_id&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">104604</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;thread_id&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">84402777</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;web_url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://www.yammer.com/yammerdeveloperstestcommunity/messages/84402777&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;direct_message&quot;</span><span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">false</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;id&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">84402777</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://www.yammer.com/api/v1/messages/84402777&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;client_type&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;Web&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;message_type&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;update&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;sender_id&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">4022984</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;replied_to_id&quot;</span><span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">null</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;attachments&quot;</span><span style="color: #339933;">:</span> <span style="color: #009900;">&#91;</span>
+        <span style="color: #009900;">&#123;</span>
+          <span style="color: #3366CC;">&quot;type&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;image&quot;</span><span style="color: #339933;">,</span>
+          <span style="color: #3366CC;">&quot;content_type&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;&quot;</span><span style="color: #339933;">,</span>
+          <span style="color: #3366CC;">&quot;uuid&quot;</span><span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">null</span><span style="color: #339933;">,</span>
+          <span style="color: #3366CC;">&quot;web_url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://www.yammer.com/yammerdeveloperstestcommunity/uploads/857663/Firefly.jpg&quot;</span><span style="color: #339933;">,</span>
+          <span style="color: #3366CC;">&quot;y_id&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">857663</span><span style="color: #339933;">,</span>
+          <span style="color: #3366CC;">&quot;image&quot;</span><span style="color: #339933;">:</span> <span style="color: #009900;">&#123;</span>
+            <span style="color: #3366CC;">&quot;thumbnail_url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://www.yammer.com/api/v1/file/857663/Firefly.jpg?view=thumbnail&quot;</span><span style="color: #339933;">,</span>
+            <span style="color: #3366CC;">&quot;url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://www.yammer.com/api/v1/file/857663/Firefly.jpg&quot;</span><span style="color: #339933;">,</span>
+            <span style="color: #3366CC;">&quot;size&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">0</span>
+          <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+          <span style="color: #3366CC;">&quot;name&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;Firefly.jpg&quot;</span><span style="color: #339933;">,</span>
+          <span style="color: #3366CC;">&quot;id&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">974915</span>
+        <span style="color: #009900;">&#125;</span>
+      <span style="color: #009900;">&#93;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;liked_by&quot;</span><span style="color: #339933;">:</span> <span style="color: #009900;">&#123;</span>
+        <span style="color: #3366CC;">&quot;count&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">,</span>
+        <span style="color: #3366CC;">&quot;names&quot;</span><span style="color: #339933;">:</span> <span style="color: #009900;">&#91;</span><span style="color: #009900;">&#93;</span>
+      <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;privacy&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;public&quot;</span>
+    <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+    <span style="color: #009900;">&#123;</span>
+      <span style="color: #3366CC;">&quot;client_url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;http://www.yammer.com&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;created_at&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;2011/03/25 00:49:29 +0000&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;system_message&quot;</span><span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">false</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;body&quot;</span><span style="color: #339933;">:</span> <span style="color: #009900;">&#123;</span>
+        <span style="color: #3366CC;">&quot;parsed&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;new test message 1&quot;</span><span style="color: #339933;">,</span>
+        <span style="color: #3366CC;">&quot;plain&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;new test message 1&quot;</span>
+      <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;network_id&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">104604</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;thread_id&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">83957686</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;sender_type&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;user&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;direct_message&quot;</span><span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">false</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;web_url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://www.yammer.com/yammerdeveloperstestcommunity/messages/83957686&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;id&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">83957686</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://www.yammer.com/api/v1/messages/83957686&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;client_type&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;testingtest&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;sender_id&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">4022984</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;replied_to_id&quot;</span><span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">null</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;message_type&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;update&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;liked_by&quot;</span><span style="color: #339933;">:</span> <span style="color: #009900;">&#123;</span>
+        <span style="color: #3366CC;">&quot;count&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">,</span>
+        <span style="color: #3366CC;">&quot;names&quot;</span><span style="color: #339933;">:</span> <span style="color: #009900;">&#91;</span><span style="color: #009900;">&#93;</span>
+      <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;attachments&quot;</span><span style="color: #339933;">:</span> <span style="color: #009900;">&#91;</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;privacy&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;public&quot;</span>
+    <span style="color: #009900;">&#125;</span>
+  <span style="color: #009900;">&#93;</span><span style="color: #339933;">,</span>
+&nbsp;
+    <span style="color: #009900;">&#123;</span>
+      <span style="color: #3366CC;">&quot;type&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;user&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;stats&quot;</span><span style="color: #339933;">:</span> <span style="color: #009900;">&#123;</span>
+        <span style="color: #3366CC;">&quot;followers&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">1</span><span style="color: #339933;">,</span>
+        <span style="color: #3366CC;">&quot;updates&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">14</span><span style="color: #339933;">,</span>
+        <span style="color: #3366CC;">&quot;following&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">2</span>
+      <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;web_url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://www.yammer.com/yammerdeveloperstestcommunity/users/mikealrogers-guest&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;mugshot_url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://assets3.yammer.com/images/no_photo_small.gif&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://www.yammer.com/api/v1/users/4022984&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;full_name&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;mikeal&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;name&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;mikealrogers-guest&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;state&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;active&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;job_title&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;Test Title&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;id&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">4022984</span>
+    <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+    <span style="color: #009900;">&#123;</span>
+      <span style="color: #3366CC;">&quot;type&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;user&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;stats&quot;</span><span style="color: #339933;">:</span> <span style="color: #009900;">&#123;</span>
+        <span style="color: #3366CC;">&quot;followers&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">1</span><span style="color: #339933;">,</span>
+        <span style="color: #3366CC;">&quot;updates&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">4</span><span style="color: #339933;">,</span>
+        <span style="color: #3366CC;">&quot;following&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">2</span>
+      <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;web_url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://www.yammer.com/yammerdeveloperstestcommunity/users/mknopp&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;mugshot_url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://assets1.yammer.com/user_uploaded/photos/p1/0141/2640/n1644278019_46479_62_small.jpg&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;url&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;https://www.yammer.com/api/v1/users/1452329&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;full_name&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;Matt Knopp&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;name&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;mknopp&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;state&quot;</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;active&quot;</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;job_title&quot;</span><span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">null</span><span style="color: #339933;">,</span>
+      <span style="color: #3366CC;">&quot;id&quot;</span><span style="color: #339933;">:</span> <span style="color: #CC0000;">1452329</span>
+    <span style="color: #009900;">&#125;</span>
+&nbsp;
+  <span style="color: #009900;">&#93;</span>
+<span style="color: #009900;">&#125;</span></pre></div></div>
+
+<p>Not so nice. Particularly, I was interested in extracting each message, a list of users, as well as data on likes. Turns out this isn't too hard in Haskell. </p>
+<p>First, we define three types to hold this data.</p>
+
+<div class="wp_syntax"><div class="code"><pre class="haskell" style="font-family:monospace;"><span style="color: #5d478b; font-style: italic;">{-# LANGUAGE OverloadedStrings #-}</span>
+&nbsp;
+<span style="color: #06c; font-weight: bold;">module</span> Yamulator <span style="color: #06c; font-weight: bold;">where</span>
+&nbsp;
+<span style="color: #06c; font-weight: bold;">import</span>           Control<span style="color: #339933; font-weight: bold;">.</span>Applicative
+<span style="color: #06c; font-weight: bold;">import</span>           Control<span style="color: #339933; font-weight: bold;">.</span><span style="color: #cccc00; font-weight: bold;">Monad</span>
+<span style="color: #06c; font-weight: bold;">import</span>           Data<span style="color: #339933; font-weight: bold;">.</span>Aeson
+<span style="color: #06c; font-weight: bold;">import</span>           Data<span style="color: #339933; font-weight: bold;">.</span>Aeson<span style="color: #339933; font-weight: bold;">.</span>Types
+<span style="color: #06c; font-weight: bold;">import</span> <span style="color: #06c; font-weight: bold;">qualified</span> Data<span style="color: #339933; font-weight: bold;">.</span>HashMap<span style="color: #339933; font-weight: bold;">.</span>Strict  <span style="color: #06c; font-weight: bold;">as</span> HM
+<span style="color: #06c; font-weight: bold;">import</span> <span style="color: #06c; font-weight: bold;">qualified</span> Data<span style="color: #339933; font-weight: bold;">.</span>ByteString<span style="color: #339933; font-weight: bold;">.</span>Lazy<span style="color: #339933; font-weight: bold;">.</span>Char8 <span style="color: #06c; font-weight: bold;">as</span> C
+<span style="color: #06c; font-weight: bold;">import</span> <span style="color: #06c; font-weight: bold;">qualified</span> Data<span style="color: #339933; font-weight: bold;">.</span>Text <span style="color: #06c; font-weight: bold;">as</span> T
+&nbsp;
+&nbsp;
+<span style="color: #06c; font-weight: bold;">data</span> Message <span style="color: #339933; font-weight: bold;">=</span> Message <span style="color: green;">&#123;</span>
+      mid       <span style="color: #339933; font-weight: bold;">::</span> <span style="color: #cccc00; font-weight: bold;">Integer</span><span style="color: #339933; font-weight: bold;">,</span>
+      plainText <span style="color: #339933; font-weight: bold;">::</span> T<span style="color: #339933; font-weight: bold;">.</span>Text<span style="color: #339933; font-weight: bold;">,</span>
+      byUserId       <span style="color: #339933; font-weight: bold;">::</span> <span style="color: #cccc00; font-weight: bold;">Integer</span><span style="color: #339933; font-weight: bold;">,</span>
+      likes   <span style="color: #339933; font-weight: bold;">::</span> <span style="color: #cccc00; font-weight: bold;">Integer</span><span style="color: #339933; font-weight: bold;">,</span>
+      inReplyTo <span style="color: #339933; font-weight: bold;">::</span> <span style="color: #cccc00; font-weight: bold;">Maybe</span> <span style="color: #cccc00; font-weight: bold;">Integer</span><span style="color: #339933; font-weight: bold;">,</span>
+      createdAt <span style="color: #339933; font-weight: bold;">::</span> T<span style="color: #339933; font-weight: bold;">.</span>Text
+&nbsp;
+<span style="color: green;">&#125;</span> <span style="color: #06c; font-weight: bold;">deriving</span> <span style="color: green;">&#40;</span><span style="color: #cccc00; font-weight: bold;">Eq</span><span style="color: #339933; font-weight: bold;">,</span> <span style="color: #cccc00; font-weight: bold;">Show</span><span style="color: green;">&#41;</span>
+&nbsp;
+<span style="color: #06c; font-weight: bold;">data</span> User <span style="color: #339933; font-weight: bold;">=</span> User <span style="color: green;">&#123;</span>
+      name <span style="color: #339933; font-weight: bold;">::</span> T<span style="color: #339933; font-weight: bold;">.</span>Text<span style="color: #339933; font-weight: bold;">,</span>
+      userId  <span style="color: #339933; font-weight: bold;">::</span> <span style="color: #cccc00; font-weight: bold;">Integer</span>
+&nbsp;
+<span style="color: green;">&#125;</span> <span style="color: #06c; font-weight: bold;">deriving</span> <span style="color: green;">&#40;</span><span style="color: #cccc00; font-weight: bold;">Eq</span><span style="color: #339933; font-weight: bold;">,</span> <span style="color: #cccc00; font-weight: bold;">Show</span><span style="color: green;">&#41;</span>
+&nbsp;
+&nbsp;
+<span style="color: #06c; font-weight: bold;">data</span> Yammers <span style="color: #339933; font-weight: bold;">=</span> Yammers <span style="color: green;">&#123;</span>
+      messages <span style="color: #339933; font-weight: bold;">::</span> <span style="color: green;">&#91;</span>Message<span style="color: green;">&#93;</span><span style="color: #339933; font-weight: bold;">,</span>
+      users    <span style="color: #339933; font-weight: bold;">::</span> <span style="color: green;">&#91;</span>User<span style="color: green;">&#93;</span> 
+<span style="color: green;">&#125;</span> <span style="color: #06c; font-weight: bold;">deriving</span> <span style="color: green;">&#40;</span><span style="color: #cccc00; font-weight: bold;">Eq</span><span style="color: #339933; font-weight: bold;">,</span> <span style="color: #cccc00; font-weight: bold;">Show</span><span style="color: green;">&#41;</span></pre></div></div>
+
+<p>This part is important. Note that Yammers contains [Message] and [User].</p>
+<p>Next, we define the instances.</p>
+
+<div class="wp_syntax"><div class="code"><pre class="haskell" style="font-family:monospace;"><span style="color: #06c; font-weight: bold;">instance</span> FromJSON Yammers <span style="color: #06c; font-weight: bold;">where</span>
+  parseJSON <span style="color: green;">&#40;</span>Object o<span style="color: green;">&#41;</span> <span style="color: #339933; font-weight: bold;">=</span> <span style="color: #06c; font-weight: bold;">do</span>
+      messages <span style="color: #339933; font-weight: bold;">&lt;-</span> parseJSON <span style="color: #339933; font-weight: bold;">=&lt;&lt;</span> <span style="color: green;">&#40;</span>o <span style="color: #339933; font-weight: bold;">.</span>: <span style="background-color: #3cb371;">&quot;messages&quot;</span><span style="color: green;">&#41;</span>
+      users <span style="color: #339933; font-weight: bold;">&lt;-</span> <span style="font-weight: bold;">mapM</span> parseJSON <span style="color: #339933; font-weight: bold;">.</span> <span style="font-weight: bold;">filter</span> <span style="color: green;">&#40;</span>\<span style="color: green;">&#40;</span>Object ref<span style="color: green;">&#41;</span> <span style="color: #339933; font-weight: bold;">-&gt;</span> HM<span style="color: #339933; font-weight: bold;">.</span><span style="font-weight: bold;">lookup</span> <span style="background-color: #3cb371;">&quot;type&quot;</span> ref <span style="color: #339933; font-weight: bold;">==</span> Just <span style="color: green;">&#40;</span><span style="color: #cccc00; font-weight: bold;">String</span> <span style="background-color: #3cb371;">&quot;user&quot;</span><span style="color: green;">&#41;</span><span style="color: green;">&#41;</span> <span style="color: #339933; font-weight: bold;">=&lt;&lt;</span> o <span style="color: #339933; font-weight: bold;">.</span>: <span style="background-color: #3cb371;">&quot;references&quot;</span>
+      <span style="font-weight: bold;">return</span> <span style="color: #339933; font-weight: bold;">$</span> Yammers messages users
+  parseJSON <span style="color: #339933; font-weight: bold;">_</span> <span style="color: #339933; font-weight: bold;">=</span> mzero
+&nbsp;
+<span style="color: #06c; font-weight: bold;">instance</span> FromJSON Message <span style="color: #06c; font-weight: bold;">where</span>
+    parseJSON <span style="color: green;">&#40;</span>Object v<span style="color: green;">&#41;</span> <span style="color: #339933; font-weight: bold;">=</span> Message <span style="color: #339933; font-weight: bold;">&lt;$&gt;</span>
+                          v <span style="color: #339933; font-weight: bold;">.</span>: <span style="background-color: #3cb371;">&quot;id&quot;</span> <span style="color: #339933; font-weight: bold;">&lt;*&gt;</span>
+                          <span style="color: green;">&#40;</span><span style="color: green;">&#40;</span>v <span style="color: #339933; font-weight: bold;">.</span>: <span style="background-color: #3cb371;">&quot;body&quot;</span><span style="color: green;">&#41;</span> <span style="color: #339933; font-weight: bold;">&gt;&gt;=</span> <span style="color: green;">&#40;</span><span style="color: #339933; font-weight: bold;">.</span>: <span style="background-color: #3cb371;">&quot;plain&quot;</span><span style="color: green;">&#41;</span><span style="color: green;">&#41;</span> <span style="color: #339933; font-weight: bold;">&lt;*&gt;</span>
+                          v <span style="color: #339933; font-weight: bold;">.</span>: <span style="background-color: #3cb371;">&quot;sender_id&quot;</span> <span style="color: #339933; font-weight: bold;">&lt;*&gt;</span>
+                          <span style="color: green;">&#40;</span><span style="color: green;">&#40;</span>v <span style="color: #339933; font-weight: bold;">.</span>: <span style="background-color: #3cb371;">&quot;liked_by&quot;</span><span style="color: green;">&#41;</span> <span style="color: #339933; font-weight: bold;">&gt;&gt;=</span> <span style="color: green;">&#40;</span><span style="color: #339933; font-weight: bold;">.</span>: <span style="background-color: #3cb371;">&quot;count&quot;</span><span style="color: green;">&#41;</span><span style="color: green;">&#41;</span> <span style="color: #339933; font-weight: bold;">&lt;*&gt;</span> <span style="color: #5d478b; font-style: italic;">-- note how we can keep drilling into nested structures like this.</span>
+                          v <span style="color: #339933; font-weight: bold;">.</span>:<span style="color: #339933; font-weight: bold;">?</span> <span style="background-color: #3cb371;">&quot;replied_to_id&quot;</span>  <span style="color: #339933; font-weight: bold;">&lt;*&gt;</span>
+                          v <span style="color: #339933; font-weight: bold;">.</span>: <span style="background-color: #3cb371;">&quot;created_at&quot;</span>
+&nbsp;
+    parseJSON <span style="color: #339933; font-weight: bold;">_</span> <span style="color: #339933; font-weight: bold;">=</span> mzero</pre></div></div>
+
+<p>Then, reading it in is a piece of cake. We can define a method like the following to serialize things out:</p>
+
+<div class="wp_syntax"><div class="code"><pre class="haskell" style="font-family:monospace;">&nbsp;
+decodeYammers <span style="color: #339933; font-weight: bold;">::</span> C<span style="color: #339933; font-weight: bold;">.</span>ByteString <span style="color: #339933; font-weight: bold;">-&gt;</span> <span style="color: #cccc00; font-weight: bold;">Maybe</span> Yammers
+decodeYammers response <span style="color: #339933; font-weight: bold;">=</span> decode response
+&nbsp;
+decodeUsers <span style="color: #339933; font-weight: bold;">::</span> C<span style="color: #339933; font-weight: bold;">.</span>ByteString <span style="color: #339933; font-weight: bold;">-&gt;</span> <span style="color: #cccc00; font-weight: bold;">Maybe</span> <span style="color: green;">&#91;</span>User<span style="color: green;">&#93;</span>
+decodeUsers response <span style="color: #339933; font-weight: bold;">=</span> decode response</pre></div></div>
+
+<p>It doesn't get any easier. I hope that helps some other Haskellers out there. Many thanks to #haskell for all the help while I was putting this together! </p>

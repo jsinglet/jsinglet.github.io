@@ -1,0 +1,17 @@
+---
+layout: post
+title:  "How to Fix Emacs CPU Problems within Gnome Shell on Ubuntu 12.10"
+date:   2012-12-12
+---
+
+	<p>A strange problem seems to afflict Ubuntu 12.10 when you are running Gnome Shell. When running a fresh gnome session, if you fire up Emacs, the gnome-shell process will start pegging the CPU. Badness. </p>
+<p> After several hours of hacking, it looks like it is simply a matter of the Emacs package having been compiled against the GTK 2 libraries. To fix it, download a new source package of Emacs from the gnu.org site and configure it with the following options: </p>
+<pre class="example">
+# ./configure --with-x-toolkit=gtk3 --prefix=/opt/sw/emacs-24.3
+</pre>
+<p> Of course you will probably need to install the dev headers and so on for GTK3, and the other associated libraries. To do that:  </p>
+<pre class="example">
+
+# sudo apt-get install libgtk-3-dev libjpeg-dev libgif-dev libtiff-dev libXpm-dev
+</pre>
+<p> Enjoy! </p>

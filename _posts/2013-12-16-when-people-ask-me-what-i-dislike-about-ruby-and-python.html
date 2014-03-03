@@ -1,0 +1,66 @@
+---
+layout: post
+title:  "When People Ask Me What I Dislike about Ruby and Python"
+date:   2013-12-16
+---
+
+	<p>Too often I am asked, "John, why do you hate Ruby and Python so much? They are so great! LOLZ!" Unfortunately, in the heat of the moment I find that I am usually unable to sufficiently suppress my near-illogical dislike of Ruby and Python long enough to make any sort of cogent argument on the topic. So then, dear reader, this post is my slightly tongue in cheek attempt at expressing these feelings. And whenever anyone asks, I'm linking them here! So let's get started...</p>
+<p>Now, besides the fact that they are both absurdly slow compared to perfectly fine languages like Java (<a href="http://benchmarksgame.alioth.debian.org/u32/benchmark.php?test=all&#038;lang=yarv&#038;lang2=java&#038;data=u32">Ruby is 100-300x slower</a>), <a href="http://techcrunch.com/2008/05/01/twitter-said-to-be-abandoning-ruby-on-rails/">Ruby kills startups</a>, and in order to make them do anything useful <a href="http://www.numpy.org/">you have to link them with Fortran libraries</a>, there is just the issue of consistency within the languages themselves. And by consistency I just mean small details in the <a href="http://gideon.smdng.nl/2009/01/an-executable-operational-semantics-for-python/">syntax and semantics of the languages that (I'm pretty sure) even experienced Ruby/Python developers don't know</a>. Or perhaps they think they do. Any category of inconsistency would serve to illustrate my point, but how about we look at how Ruby and Python infer types in expressions that contain NULL objects. </p>
+<p>In Ruby, can you guess what these expressions evaluate to? No cheating! </p>
+<p><code><br />
+nil &#038;& true<br />
+</code><br />
+.<br />
+.<br />
+.<br />
+.</p>
+<p><strong>Answer: nil</strong></p>
+<p>Ok, ok, so how about this?</p>
+<p><code><br />
+nil &#038;& false<br />
+</code><br />
+.<br />
+.<br />
+.<br />
+.</p>
+<p><strong>Answer: nil again!</strong> (shouldn't be shocking)</p>
+<p>So you think you get how this works, right? How about this one?</p>
+<p><code><br />
+false &#038;& nil<br />
+</code><br />
+.<br />
+.<br />
+.<br />
+.</p>
+<p><strong>Answer: false!</strong> </p>
+<p>Ok, so maybe you are really great at this. Since you got the last one, what about this one?</p>
+<p><code><br />
+true &#038;& nil<br />
+</code><br />
+.<br />
+.<br />
+.<br />
+.</p>
+<p><strong>Answer: nil again!</strong><em> (wasn't that obvious???)<br />
+</em><br />
+Enough of that. Let's try some Python:</p>
+<p><code><br />
+print ((not None) + 1)<br />
+</code><br />
+.<br />
+.<br />
+.<br />
+.</p>
+<p><strong>Answer: 2</strong></p>
+<p>Surprising? Maybe not if you are a C programmer. So how about this then?</p>
+<p><code><br />
+print ((not None) and True)<br />
+</code><br />
+.<br />
+.<br />
+.<br />
+.</p>
+<p><strong><br />
+Answer: True!</strong></p>
+		
+
